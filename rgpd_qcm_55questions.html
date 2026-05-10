@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM RGPD — 55 Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #f4f6fb;
+  --card:    #ffffff;
+  --border:  #e2e8f0;
+  --navy:    #1a2f4e;
+  --blue:    #1d4ed8;
+  --teal:    #0891b2;
+  --green:   #16a34a;
+  --red:     #dc2626;
+  --amber:   #d97706;
+  --purple:  #7c3aed;
+  --text:    #1e293b;
+  --muted:   #64748b;
+  --shadow:  0 4px 16px rgba(26,47,78,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── HEADER ── */
+.header{
+  background:linear-gradient(110deg,#1a2f4e 0%,#1d4ed8 60%,#0891b2 100%);
+  color:#fff;
+  padding:24px 28px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.header-left h1{font-size:1.35rem;font-weight:700;letter-spacing:-.3px}
+.header-left p{font-size:.82rem;opacity:.75;margin-top:3px}
+.score-display{
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:10px;
+  padding:10px 20px;
+  text-align:center;
+}
+.score-num{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:1.6rem;
+  font-weight:700;
+  line-height:1;
+  color:#fff;
+}
+.score-label{font-size:.72rem;opacity:.7;margin-top:2px}
+
+/* ── PROGRESS ── */
+.progress-wrap{
+  background:var(--navy);
+  padding:10px 28px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.progress-bar{
+  flex:1;
+  height:7px;
+  background:rgba(255,255,255,.15);
+  border-radius:4px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#60a5fa,#34d399);
+  border-radius:4px;
+  transition:width .4s ease;
+  width:0%;
+}
+.progress-text{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.78rem;
+  color:#94a3b8;
+  white-space:nowrap;
+}
+
+/* ── MAIN ── */
+.main{
+  max-width:780px;
+  margin:0 auto;
+  padding:28px 20px 60px;
+}
+
+/* ── QUIZ CARD ── */
+.quiz-card{
+  background:var(--card);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+  overflow:hidden;
+  animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.card-top{
+  padding:20px 24px 0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.cat-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:4px 12px;
+  font-size:.76rem;
+  font-weight:600;
+  color:var(--muted);
+}
+.q-num{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.82rem;
+  color:var(--muted);
+  margin-left:auto;
+}
+
+.question-text{
+  padding:20px 24px 6px;
+  font-size:1.12rem;
+  font-weight:600;
+  color:var(--navy);
+  line-height:1.55;
+}
+
+.art-ref{
+  padding:0 24px 16px;
+  font-size:.76rem;
+  color:var(--teal);
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:600;
+}
+
+/* ── OPTIONS ── */
+.options{padding:0 16px 8px;display:flex;flex-direction:column;gap:8px}
+
+.option{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:13px 16px;
+  border-radius:9px;
+  border:2px solid var(--border);
+  cursor:pointer;
+  transition:border-color .15s, background .15s, transform .1s;
+  user-select:none;
+}
+.option:hover:not(.disabled){
+  border-color:var(--blue);
+  background:#eff6ff;
+  transform:translateX(2px);
+}
+.option.disabled{cursor:default}
+
+.opt-letter{
+  width:28px;height:28px;
+  border-radius:50%;
+  background:var(--bg);
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.82rem;
+  color:var(--muted);
+  flex-shrink:0;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.opt-text{
+  font-size:.97rem;
+  color:var(--text);
+  line-height:1.5;
+  padding-top:2px;
+}
+
+/* States */
+.option.correct{
+  border-color:var(--green);
+  background:#f0fdf4;
+}
+.option.correct .opt-letter{
+  background:var(--green);border-color:var(--green);color:#fff;
+}
+.option.correct .opt-text{color:var(--green);font-weight:600}
+
+.option.wrong{
+  border-color:var(--red);
+  background:#fff1f2;
+}
+.option.wrong .opt-letter{
+  background:var(--red);border-color:var(--red);color:#fff;
+}
+.option.wrong .opt-text{color:var(--red)}
+
+.option.neutral-dim{
+  opacity:.45;
+}
+
+/* ── EXPLANATION ── */
+.explanation{
+  margin:12px 16px 8px;
+  padding:13px 16px;
+  border-radius:9px;
+  font-size:.9rem;
+  line-height:1.6;
+  display:none;
+}
+.explanation.show{display:block;animation:fadeIn .25s ease}
+.explanation.correct-exp{
+  background:#f0fdf4;border-left:4px solid var(--green);color:#14532d;
+}
+.explanation.wrong-exp{
+  background:#fff1f2;border-left:4px solid var(--red);color:#7f1d1d;
+}
+.exp-icon{font-weight:700;margin-right:6px}
+
+/* ── ACTIONS ── */
+.card-actions{
+  padding:16px 24px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.result-mini{
+  font-size:.88rem;
+  color:var(--muted);
+  display:none;
+}
+.result-mini.show{display:block}
+.result-mini .correct-label{color:var(--green);font-weight:700}
+.result-mini .wrong-label{color:var(--red);font-weight:700}
+
+.btn{
+  padding:11px 28px;
+  border-radius:8px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:.95rem;
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+  transition:all .15s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-next{
+  background:var(--blue);color:#fff;
+  box-shadow:0 2px 8px rgba(29,78,216,.25);
+}
+.btn-next:hover{background:#1e40af;transform:translateY(-1px)}
+.btn-next:disabled{background:#cbd5e1;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-restart{
+  background:var(--navy);color:#fff;
+  box-shadow:0 2px 8px rgba(26,47,78,.25);
+}
+.btn-restart:hover{background:#0f1f33}
+
+/* ── FINAL SCREEN ── */
+.final-screen{
+  background:var(--card);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+  padding:40px 32px;
+  text-align:center;
+  animation:fadeIn .4s ease;
+  display:none;
+}
+.final-trophy{font-size:4rem;margin-bottom:16px}
+.final-title{font-size:1.6rem;font-weight:700;color:var(--navy);margin-bottom:8px}
+.final-sub{font-size:1rem;color:var(--muted);margin-bottom:28px}
+.final-score-big{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:3.5rem;
+  font-weight:700;
+  color:var(--blue);
+  line-height:1;
+  margin-bottom:8px;
+}
+.final-score-label{font-size:.9rem;color:var(--muted);margin-bottom:28px}
+.perf-msg{
+  font-size:1.05rem;
+  font-weight:600;
+  padding:14px 20px;
+  border-radius:10px;
+  margin-bottom:28px;
+  line-height:1.5;
+}
+.perf-excellent{background:#f0fdf4;color:#14532d;border:2px solid #86efac}
+.perf-bien{background:#eff6ff;color:#1e3a5f;border:2px solid #93c5fd}
+.perf-moyen{background:#fffbeb;color:#78350f;border:2px solid #fcd34d}
+.perf-faible{background:#fff1f2;color:#7f1d1d;border:2px solid #fca5a5}
+
+.final-breakdown{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:28px;
+  text-align:left;
+}
+.breakdown-item{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 14px;
+}
+.breakdown-val{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:1.4rem;
+  font-weight:700;
+  color:var(--navy);
+}
+.breakdown-label{font-size:.78rem;color:var(--muted);margin-top:2px}
+
+/* ── LOADING ── */
+#loading{
+  text-align:center;
+  padding:60px 20px;
+  color:var(--muted);
+  font-size:1rem;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .header{padding:16px}
+  .header-left h1{font-size:1.1rem}
+  .main{padding:16px 12px 40px}
+  .question-text{font-size:1rem;padding:16px 16px 6px}
+  .card-top,.art-ref,.options{padding-left:12px;padding-right:12px}
+  .card-actions{padding:12px 16px 20px}
+  .final-breakdown{grid-template-columns:1fr 1fr}
+  .final-screen{padding:28px 18px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>QCM RGPD — 55 Questions</h1>
+    <p>Règlement Général sur la Protection des Données · Préparation à l'examen 2026 · 55 questions</p>
+  </div>
+  <div class="score-display">
+    <div class="score-num" id="score-display">0 / 0</div>
+    <div class="score-label">Score</div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-text" id="progress-text">0 / 50</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div id="loading">Chargement du QCM…</div>
+  <div class="quiz-card" id="quiz-card" style="display:none">
+    <div class="card-top">
+      <span class="cat-badge" id="cat-badge">—</span>
+      <span class="q-num" id="q-num">Q1 / 50</span>
+    </div>
+    <div class="question-text" id="question-text">…</div>
+    <div class="art-ref" id="art-ref"></div>
+    <div class="options" id="options"></div>
+    <div class="explanation" id="explanation"></div>
+    <div class="card-actions">
+      <div class="result-mini" id="result-mini"></div>
+      <button class="btn btn-next" id="btn-next" disabled onclick="nextQuestion()">
+        Question suivante →
+      </button>
+    </div>
+  </div>
+
+  <div class="final-screen" id="final-screen">
+    <div class="final-trophy" id="final-trophy">🏆</div>
+    <div class="final-title">QCM terminé !</div>
+    <div class="final-sub">Voici ton résultat pour les 50 questions RGPD</div>
+    <div class="final-score-big" id="final-score-big">—</div>
+    <div class="final-score-label" id="final-score-label">bonnes réponses sur 50</div>
+    <div class="perf-msg" id="perf-msg"></div>
+    <div class="final-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-val" id="bd-correct" style="color:var(--green)">—</div>
+        <div class="breakdown-label">✅ Correctes</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-val" id="bd-wrong" style="color:var(--red)">—</div>
+        <div class="breakdown-label">❌ Incorrectes</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-val" id="bd-pct" style="color:var(--blue)">—</div>
+        <div class="breakdown-label">📊 Taux de réussite</div>
+      </div>
+    </div>
+    <button class="btn btn-restart" onclick="restartQuiz()">🔄 Recommencer</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+
+  // ══════════════════════════════════════════════
+  // BLOC 1 — CONTEXTE & FONDEMENTS (Q1–Q7)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Le RGPD est juridiquement...",
+    opts: [
+      "Une loi nationale française applicable uniquement en France",
+      "Un règlement européen directement applicable dans tous les États membres",
+      "Une directive européenne que chaque pays transpose dans sa propre loi",
+      "Un accord international non contraignant"
+    ],
+    correct: 1,
+    exp: "Un règlement européen s'applique directement et uniformément dans tous les États membres, sans avoir besoin d'être retranscrit dans chaque loi nationale. C'est pourquoi le RGPD est identique en France, en Allemagne, en Espagne, etc."
+  },
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Depuis quelle date le RGPD est-il applicable (obligations effectives) ?",
+    opts: [
+      "7 octobre 1978",
+      "25 mai 2016",
+      "25 mai 2018",
+      "1er janvier 2020"
+    ],
+    correct: 2,
+    exp: "Attention à ne pas confondre : le RGPD est entré en VIGUEUR en mai 2016, mais il est devenu APPLICABLE (les obligations sont effectives) le 25 mai 2018. C'est cette seconde date qui est la date clé à retenir."
+  },
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Quelle loi française le RGPD s'inscrit-il dans la continuité ?",
+    opts: [
+      "La loi de 2004 sur la confiance dans l'économie numérique (LCEN)",
+      "La loi Informatique et Libertés de 1978",
+      "La loi de 2016 pour une République numérique",
+      "La loi de 1995 sur la protection des données"
+    ],
+    correct: 1,
+    exp: "Le RGPD prolonge la loi française Informatique et Libertés du 6 janvier 1978, qui avait également créé la CNIL. C'est la loi pionnière en matière de protection des données personnelles en France."
+  },
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Quelle est la différence fondamentale entre un règlement et une directive européenne ?",
+    opts: [
+      "Un règlement est optionnel, une directive est obligatoire",
+      "Un règlement s'applique directement dans tous les États membres, une directive doit être transposée dans chaque loi nationale",
+      "Un règlement concerne les entreprises publiques, une directive les entreprises privées",
+      "Il n'y a aucune différence pratique pour les entreprises"
+    ],
+    correct: 1,
+    exp: "Un RÈGLEMENT est d'application directe et uniforme dans tous les pays de l'UE (comme le RGPD). Une DIRECTIVE fixe des objectifs mais laisse chaque pays libre de les intégrer dans son droit national, ce qui crée des différences selon les pays."
+  },
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Le RGPD est-il applicable aux petites entreprises ?",
+    opts: [
+      "Non, uniquement aux entreprises de plus de 250 salariés",
+      "Non, uniquement aux entreprises cotées en bourse",
+      "Oui, à toute organisation manipulant des données personnelles d'Européens, selon le niveau de risque",
+      "Oui, mais uniquement si elles réalisent plus de 10 millions d'euros de chiffre d'affaires"
+    ],
+    correct: 2,
+    exp: "Le RGPD s'applique à toute entreprise, association, autorité publique ou sous-traitant qui manipule des données personnelles concernant des Européens — quelle que soit leur taille. Les obligations sont toutefois proportionnelles aux risques."
+  },
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Une entreprise peut-elle s'exonérer de ses responsabilités RGPD en confiant la gestion des données à un prestataire informatique ?",
+    opts: [
+      "Oui, la responsabilité est transférée au prestataire dès lors qu'un contrat est signé",
+      "Non, le responsable du traitement reste responsable même si un sous-traitant gère techniquement les données",
+      "Oui, si le prestataire est certifié ISO 27001",
+      "Oui, à condition que le contrat mentionne explicitement ce transfert de responsabilité"
+    ],
+    correct: 1,
+    exp: "On ne peut pas se cacher derrière son prestataire. Le responsable du traitement reste responsable de la conformité même si c'est techniquement le sous-traitant qui gère les données au quotidien. C'est pourquoi il faut vérifier les contrats avec ses prestataires."
+  },
+  {
+    cat: "📜 Contexte & Fondements",
+    art: "",
+    q: "Lequel de ces éléments NE constitue PAS un avantage de la conformité RGPD pour une entreprise ?",
+    opts: [
+      "Meilleure image commerciale et confiance des clients",
+      "Exemption totale et définitive de tout contrôle de la CNIL",
+      "Amélioration de la sécurité informatique (hygiène informatique)",
+      "Réduction du risque d'amendes en cas de violation"
+    ],
+    correct: 1,
+    exp: "La conformité RGPD ne garantit pas une exemption totale de contrôle de la CNIL. Même une entreprise conforme peut faire l'objet d'une vérification. En revanche, les autres avantages sont bien réels : meilleure sécurité, image commerciale, réduction du risque d'amende."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 2 — DÉFINITIONS ART. 4 (Q8–Q16)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Qu'est-ce qu'une donnée à caractère personnel (DCP) ?",
+    opts: [
+      "Uniquement les données bancaires et médicales d'une personne",
+      "Toute information relative à une personne physique identifiée ou identifiable",
+      "Les données numériques stockées sur un serveur d'entreprise",
+      "Les données appartenant légalement à une entreprise"
+    ],
+    correct: 1,
+    exp: "Une DCP est TOUTE information permettant d'identifier une personne — directement (nom, photo) ou indirectement (adresse IP, n° de sécurité sociale, localisation, empreinte digitale...). La définition est très large."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Le RGPD s'applique uniquement aux données numériques. Vrai ou Faux ?",
+    opts: [
+      "Vrai — seules les données numériques sont concernées",
+      "Faux — le RGPD s'applique à toute donnée personnelle, papier ou numérique",
+      "Vrai — mais uniquement pour les entreprises de plus de 50 salariés",
+      "Faux — mais les données papier ne sont concernées que si elles sont numérisées"
+    ],
+    correct: 1,
+    exp: "FAUX. C'est un piège classique. Le RGPD s'applique à tous les traitements de données personnelles, qu'ils soient numériques ou papier, automatisés ou manuels. Un classeur de fiches clients, des CV imprimés dans un tiroir : tout est concerné."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Parmi ces exemples, lequel N'EST PAS une donnée à caractère personnel ?",
+    opts: [
+      "Une adresse IP",
+      "Le chiffre d'affaires global d'une entreprise",
+      "Une empreinte digitale",
+      "Une adresse e-mail professionnelle nominative (ex : jean.dupont@entreprise.fr)"
+    ],
+    correct: 1,
+    exp: "Le chiffre d'affaires d'une entreprise est une donnée d'entreprise (personne morale), pas une donnée personnelle (personne physique). Le RGPD ne protège que les personnes physiques. En revanche, une IP, une empreinte ou un e-mail nominatif permettent d'identifier une personne physique."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Qu'est-ce qu'un traitement de données au sens du RGPD ?",
+    opts: [
+      "Uniquement les opérations automatisées par des logiciels",
+      "Uniquement la collecte initiale et le stockage des données",
+      "Toute opération appliquée à des données personnelles — collecte, stockage, utilisation, transmission, suppression... — automatisée ou non",
+      "Uniquement les transmissions de données à des tiers extérieurs"
+    ],
+    correct: 2,
+    exp: "Le traitement englobe TOUTES les opérations sur des données personnelles : collecte, enregistrement, organisation, stockage, modification, consultation, utilisation, transmission, diffusion, limitation, effacement... Cela s'applique qu'il soit automatisé ou manuel."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Qui est le responsable du traitement (RT) ?",
+    opts: [
+      "Le prestataire informatique qui héberge techniquement les données",
+      "L'employé désigné comme référent RGPD dans l'entreprise",
+      "L'entité (entreprise, association, organisme) qui détermine les finalités et les moyens du traitement",
+      "La CNIL, qui est responsable de la conformité des traitements"
+    ],
+    correct: 2,
+    exp: "Le RT est celui qui décide POURQUOI (les finalités) et COMMENT (les moyens) les données sont traitées. C'est généralement l'entreprise ou l'organisation, pas le prestataire informatique qui héberge les données."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Qu'est-ce qu'un sous-traitant au sens du RGPD ?",
+    opts: [
+      "Un fournisseur de matériaux qui n'a aucun accès aux données de l'entreprise",
+      "L'entité qui traite des données personnelles pour le compte du responsable du traitement, sur ses instructions",
+      "Un employé en contrat à durée déterminée qui traite les données de l'entreprise",
+      "Tout partenaire commercial ayant signé un accord de confidentialité"
+    ],
+    correct: 1,
+    exp: "Le sous-traitant traite des données POUR LE COMPTE du RT, sur ses instructions. Il ne peut pas utiliser ces données pour ses propres fins. Exemples : un logiciel de paye en SaaS, un hébergeur cloud, un prestataire de mailing."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 37–39",
+    q: "Quel est le rôle principal du DPO (Data Protection Officer) ?",
+    opts: [
+      "Gérer techniquement la cybersécurité et les sauvegardes",
+      "Informer, conseiller et contrôler la conformité RGPD au sein de l'organisation",
+      "Signer les contrats avec les sous-traitants au nom du RT",
+      "Représenter l'entreprise devant les tribunaux en cas de litige"
+    ],
+    correct: 1,
+    exp: "Le DPO (ou DPD) informe, conseille le RT et contrôle le respect du RGPD. Il identifie les traitements, analyse leur conformité, formule des recommandations, et est le point de contact avec la CNIL et les personnes concernées."
+  },
+  {
+    cat: "📘 Définitions (Art. 4)",
+    art: "Art. 4",
+    q: "Laquelle de ces situations constitue une violation de données à caractère personnel ?",
+    opts: [
+      "La mise à jour d'un antivirus sur un serveur contenant des données personnelles",
+      "La sauvegarde quotidienne des données sur un serveur sécurisé en interne",
+      "L'envoi accidentel d'un e-mail contenant des données personnelles à la mauvaise personne",
+      "L'archivage de documents dans un coffre-fort ignifugé"
+    ],
+    correct: 2,
+    exp: "Une violation de données, c'est toute divulgation non autorisée, accidentelle ou illicite, de données personnelles. Envoyer un fichier client au mauvais destinataire est bien une violation. Une clé USB perdue, un dossier oublié dans le train : même chose."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 3 — GRANDS PRINCIPES (Q17–Q25)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.1.c",
+    q: "Le principe de minimisation des données signifie que...",
+    opts: [
+      "On doit minimiser le nombre d'employés qui ont accès aux données",
+      "On ne peut collecter que les données strictement nécessaires à la finalité poursuivie",
+      "On doit réduire la durée de conservation au minimum légal d'un an",
+      "On doit minimiser le nombre de sous-traitants qui traitent les données"
+    ],
+    correct: 1,
+    exp: "Le principe de minimisation (Art. 5.1.c) interdit de collecter des données 'au cas où elles seraient utiles un jour'. On ne collecte que ce qui est strictement nécessaire à l'objectif annoncé. Exemple : pas besoin de la date de naissance pour livrer un colis."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.2",
+    q: "Le principe d'accountability implique un 'renversement de la charge de la preuve'. Qu'est-ce que cela signifie concrètement ?",
+    opts: [
+      "La CNIL doit désormais prouver que l'entreprise est non conforme avant de sanctionner",
+      "C'est maintenant au RT de prouver qu'il respecte le RGPD, et non à la CNIL de prouver la non-conformité",
+      "Les entreprises peuvent se défendre en prouvant que leurs concurrents ne sont pas conformes",
+      "Les amendes ne peuvent pas être prononcées sans preuve d'une intention malveillante"
+    ],
+    correct: 1,
+    exp: "Avant le RGPD, c'était à la CNIL de démontrer qu'une entreprise n'était pas conforme. Avec l'accountability (Art. 5.2), c'est l'inverse : le RT doit être capable de prouver SA conformité à tout moment, notamment via des registres, des politiques et des procédures documentées."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 25",
+    q: "Que signifie le principe de 'Privacy by Design' ?",
+    opts: [
+      "Créer une interface graphique (design) qui facilite la lecture des politiques de confidentialité",
+      "Intégrer la protection des données dès la conception d'un système ou d'un traitement, pas après coup",
+      "Utiliser des couleurs spécifiques sur les formulaires de collecte de données",
+      "Faire valider le design de son site web par la CNIL avant publication"
+    ],
+    correct: 1,
+    exp: "Le Privacy by Design (Art. 25) signifie que la protection des données doit être pensée et intégrée dès la conception d'un projet, d'un logiciel, d'un service — pas ajoutée après. Ce n'est pas une question de design visuel."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.1.b",
+    q: "Le principe de limitation des finalités interdit...",
+    opts: [
+      "De collecter plus de 3 finalités différentes pour un même traitement",
+      "D'utiliser les données collectées pour des finalités incompatibles avec celles annoncées initialement",
+      "De partager les finalités d'un traitement avec des tiers sans autorisation de la CNIL",
+      "De modifier les finalités d'un traitement pendant la durée de conservation des données"
+    ],
+    correct: 1,
+    exp: "Si une entreprise collecte des données pour 'gérer les commandes clients', elle ne peut pas ensuite utiliser ces mêmes données pour faire du profilage commercial, à moins d'en avoir informé les personnes. C'est le principe de limitation des finalités."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.1.d",
+    q: "Que prévoit le principe d'exactitude des données (Art. 5.1.d) ?",
+    opts: [
+      "Que toutes les données collectées doivent être vérifiées par un notaire",
+      "Que les données doivent être exactes et maintenues à jour ; les données inexactes doivent être corrigées ou supprimées",
+      "Que l'entreprise doit faire vérifier ses données par un audit annuel obligatoire",
+      "Que les données doivent être exactes au moment de la collecte mais pas nécessairement ensuite"
+    ],
+    correct: 1,
+    exp: "Le RT a l'obligation de s'assurer que les données sont exactes et à jour. Si une personne déménage et que l'adresse est erronée, elle doit être corrigée. C'est pourquoi le droit de rectification (Art. 16) est important pour les personnes."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.1.e",
+    q: "Le principe de limitation de la conservation signifie que...",
+    opts: [
+      "Les données doivent être conservées au minimum 5 ans",
+      "Les données peuvent être conservées indéfiniment si elles sont correctement sécurisées",
+      "La durée de conservation est fixée par la CNIL à 3 ans pour toutes les entreprises",
+      "Les données ne peuvent être conservées au-delà d'une durée proportionnelle à la finalité, définie par le RT"
+    ],
+    correct: 3,
+    exp: "Il n'existe pas de durée légale unique applicable à tous. C'est le responsable du traitement qui définit une durée maximale de conservation proportionnelle à la finalité. Cette durée doit être documentée dans le registre."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.1.a",
+    q: "Quels sont les trois principes que l'article 5.1.a regroupe ?",
+    opts: [
+      "Minimisation, exactitude et limitation de conservation",
+      "Licéité, transparence et loyauté",
+      "Accountability, Privacy by Design et intégrité",
+      "Consentement, finalité et portabilité"
+    ],
+    correct: 1,
+    exp: "L'article 5.1.a regroupe les principes de licéité (avoir une base légale), de transparence (informer clairement les personnes) et de loyauté (respecter ce qui a été annoncé). Ces trois principes sont liés à la relation de confiance avec la personne concernée."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 25",
+    q: "Quelle est la différence entre 'Privacy by Design' et 'Privacy by Default' ?",
+    opts: [
+      "Ce sont deux expressions pour le même concept, utilisées indifféremment",
+      "Privacy by Design concerne la conception du système ; Privacy by Default signifie que par défaut, le niveau de protection le plus élevé est automatiquement activé",
+      "Privacy by Design s'applique aux grandes entreprises ; Privacy by Default aux PME",
+      "Privacy by Design est une obligation légale ; Privacy by Default est une recommandation non contraignante"
+    ],
+    correct: 1,
+    exp: "Privacy by DESIGN : intégrer la protection dès la CONCEPTION du système. Privacy by DEFAULT : par défaut (sans action de l'utilisateur), les paramètres de protection les plus stricts sont activés. Ex : les options de partage de données sont désactivées par défaut et c'est l'utilisateur qui les active."
+  },
+  {
+    cat: "⚖️ Grands principes",
+    art: "Art. 5.1.f",
+    q: "Le principe d'intégrité et de confidentialité (Art. 5.1.f) impose au RT de...",
+    opts: [
+      "Nommer obligatoirement un Responsable de la Sécurité des Systèmes d'Information (RSSI)",
+      "Mettre en place des mesures techniques et organisationnelles appropriées pour protéger les données",
+      "Faire certifier ses systèmes ISO 27001 avant de traiter des données personnelles",
+      "Chiffrer systématiquement toutes les données, quelle que soit leur sensibilité"
+    ],
+    correct: 1,
+    exp: "Le RT doit mettre en place des mesures de sécurité APPROPRIÉES — c'est-à-dire proportionnelles au risque. Aucune mesure spécifique n'est imposée par la loi, mais on attend un niveau de sécurité adapté à la nature des données traitées."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 4 — BASES LÉGALES (Q26–Q31)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "🔑 Bases légales",
+    art: "Art. 6",
+    q: "Combien de bases légales permettent de justifier un traitement de données personnelles ?",
+    opts: [
+      "1 seule — le consentement",
+      "2 — le consentement ou l'obligation légale",
+      "4 — consentement, contrat, obligation légale et intérêt public",
+      "6 — consentement, contrat, obligation légale, intérêts vitaux, mission publique et intérêt légitime"
+    ],
+    correct: 3,
+    exp: "Il existe exactement 6 bases légales (Art. 6). Un traitement est licite si au moins l'une d'elles s'applique. Le consentement n'est qu'une option parmi six — c'est un piège récurrent dans les QCM."
+  },
+  {
+    cat: "🔑 Bases légales",
+    art: "Art. 6",
+    q: "Une entreprise traite les données de ses salariés pour gérer la paie. Quelle est la base légale la plus adaptée ?",
+    opts: [
+      "Le consentement des salariés",
+      "L'intérêt légitime de l'employeur",
+      "L'exécution du contrat de travail",
+      "La mission d'intérêt public"
+    ],
+    correct: 2,
+    exp: "Le traitement des données pour verser les salaires est NÉCESSAIRE à l'exécution du contrat de travail. La base légale 'exécution d'un contrat' est ici la plus pertinente. Demander le consentement du salarié serait inapproprié car le consentement doit être libre, ce qui est difficile dans une relation employeur/employé."
+  },
+  {
+    cat: "🔑 Bases légales",
+    art: "Art. 6",
+    q: "Quelle base légale est la plus souple mais aussi la plus délicate à utiliser ?",
+    opts: [
+      "Le consentement, car il peut être retiré à tout moment",
+      "L'obligation légale, car elle est difficile à démontrer",
+      "L'intérêt légitime, car l'intérêt du RT ne doit pas l'emporter sur les droits des personnes",
+      "Les intérêts vitaux, car ils nécessitent une situation d'urgence réelle"
+    ],
+    correct: 2,
+    exp: "L'intérêt légitime est la base légale la plus utilisée par les entreprises commerciales, mais aussi la plus risquée. Pour l'utiliser, il faut démontrer : (1) que l'intérêt est légitime, (2) que le traitement est nécessaire, et (3) que cet intérêt ne l'emporte pas sur les droits des personnes. Un test de mise en balance doit être effectué."
+  },
+  {
+    cat: "🔑 Bases légales",
+    art: "Art. 6",
+    q: "Dans quel cas la base légale 'obligation légale' s'applique-t-elle ?",
+    opts: [
+      "Quand l'entreprise a un intérêt commercial fort à traiter les données",
+      "Quand la personne a consenti implicitement au traitement",
+      "Quand la loi impose à l'organisation de traiter ces données (ex. : conservation des bulletins de paye)",
+      "Quand le traitement est nécessaire à la livraison d'une commande"
+    ],
+    correct: 2,
+    exp: "L'obligation légale s'applique quand une loi ou un règlement IMPOSE le traitement. Exemples : conservation des fiches de paye pour les obligations fiscales et sociales, déclarations à l'URSSAF, tenue de registres obligatoires. L'entreprise n'a pas le choix."
+  },
+  {
+    cat: "🔑 Bases légales",
+    art: "Art. 6",
+    q: "Le consentement est-il TOUJOURS la meilleure base légale à utiliser ?",
+    opts: [
+      "Oui, le consentement est toujours préférable car il implique la personne dans la décision",
+      "Non, d'autres bases légales peuvent être plus appropriées (contrat, obligation légale...) et le consentement est parfois impossible à obtenir librement",
+      "Oui, car c'est la seule base qui protège totalement l'entreprise d'une sanction",
+      "Non, mais il est obligatoire pour toute donnée sensible"
+    ],
+    correct: 1,
+    exp: "Non. Par exemple, demander le consentement d'un employé pour traiter ses données de paye est inapproprié car le salarié n'est pas libre de refuser face à son employeur. La base 'exécution du contrat' est plus adaptée. Chaque traitement doit avoir la base légale LA PLUS APPROPRIÉE, pas forcément le consentement."
+  },
+  {
+    cat: "🔑 Bases légales",
+    art: "Art. 6",
+    q: "Un hôpital traite des données médicales de patients pour leur prodiguer des soins. Quelle base légale s'applique principalement ?",
+    opts: [
+      "Le consentement du patient (signé à l'admission)",
+      "L'intérêt légitime de l'hôpital",
+      "L'exécution d'une mission d'intérêt public",
+      "L'obligation légale de soigner"
+    ],
+    correct: 2,
+    exp: "Un hôpital public exerce une mission de service public. Le traitement des données de santé pour délivrer des soins relève de l'exécution d'une mission d'intérêt public (Art. 6.1.e), combinée éventuellement avec l'Art. 9 pour les données de santé (catégorie particulière)."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 5 — CONSENTEMENT (Q32–Q37)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "🖊️ Consentement",
+    art: "Art. 7",
+    q: "Pour être valide, un consentement doit être... (toutes les conditions s'appliquent)",
+    opts: [
+      "Écrit, daté, signé et validé par un juriste",
+      "Libre, spécifique, éclairé et univoque",
+      "Libre, général, préalable et irrévocable",
+      "Explicite, notarial, daté et personnel"
+    ],
+    correct: 1,
+    exp: "Les 4 conditions du consentement valide selon le RGPD (Art. 7) sont : LIBRE (pas de contrainte), SPÉCIFIQUE (une finalité = un consentement), ÉCLAIRÉ (informé avant) et UNIVOQUE (acte positif clair). Mémo : L.S.É.U."
+  },
+  {
+    cat: "🖊️ Consentement",
+    art: "Art. 7",
+    q: "Un formulaire d'inscription comporte une case déjà cochée : '☑ J'accepte de recevoir des offres commerciales'. Ce consentement est-il valide ?",
+    opts: [
+      "Oui, car la personne peut décocher la case si elle le souhaite",
+      "Oui, si la case est visible et que les CGU sont accessibles",
+      "Non, car un consentement doit être un acte positif (case cochée activement), pas une inaction",
+      "Non, mais seulement si la personne a moins de 16 ans"
+    ],
+    correct: 2,
+    exp: "Une case pré-cochée n'est PAS un consentement valide. Le consentement doit être UNIVOQUE, c'est-à-dire un acte positif clair de la personne. Ne pas décocher une case n'est pas un acte positif. La CNIL est très stricte sur ce point."
+  },
+  {
+    cat: "🖊️ Consentement",
+    art: "Art. 7",
+    q: "Une case unique 'J'accepte de recevoir la newsletter ET les offres promotionnelles de partenaires' est-elle conforme ?",
+    opts: [
+      "Oui, si la case n'est pas pré-cochée",
+      "Oui, si les partenaires sont listés dans les CGU",
+      "Non, car le consentement doit être spécifique : 1 finalité = 1 consentement — il faut 2 cases séparées",
+      "Non, car les offres de partenaires nécessitent un accord notarié"
+    ],
+    correct: 2,
+    exp: "Le consentement doit être SPÉCIFIQUE : une finalité = un consentement. La newsletter ET les offres de partenaires sont deux finalités distinctes qui nécessitent chacune une case de consentement séparée. La personne doit pouvoir accepter l'une sans l'autre. C'est exactement ce pour quoi TAGADAMEDIA a été sanctionné."
+  },
+  {
+    cat: "🖊️ Consentement",
+    art: "Art. 7",
+    q: "Le consentement 'éclairé' implique que...",
+    opts: [
+      "La personne a lu et signé les CGU complètes avant de consentir",
+      "La personne a reçu, avant de consentir, les informations sur qui traite les données, pourquoi, comment et pour combien de temps",
+      "La personne a bénéficié d'un entretien avec le DPO avant de consentir",
+      "La personne a consulté un avocat spécialisé en droit des données"
+    ],
+    correct: 1,
+    exp: "Un consentement éclairé signifie que la personne a été suffisamment informée AVANT de consentir : identité du RT, finalités du traitement, droits dont elle dispose, durée de conservation... Sans cette information préalable, le consentement est nul."
+  },
+  {
+    cat: "🖊️ Consentement",
+    art: "Art. 7",
+    q: "Une personne peut-elle retirer son consentement après l'avoir donné ?",
+    opts: [
+      "Non, un consentement donné est définitif et irrévocable",
+      "Oui, mais seulement dans les 14 jours suivant le consentement initial",
+      "Oui, à tout moment, et le retrait doit être aussi simple que le consentement lui-même",
+      "Oui, mais uniquement par courrier recommandé au responsable du traitement"
+    ],
+    correct: 2,
+    exp: "Le retrait du consentement est un droit fondamental. Il peut être exercé À TOUT MOMENT, sans justification. De plus, la procédure de retrait doit être aussi simple que celle pour consentir. Et le retrait du consentement n'affecte pas la licéité du traitement effectué avant ce retrait."
+  },
+  {
+    cat: "🖊️ Consentement",
+    art: "Art. 7",
+    q: "Lequel de ces éléments INVALIDE un consentement ?",
+    opts: [
+      "Le consentement a été donné par écrit sur un formulaire papier",
+      "Le consentement conditionne l'accès à un service (ex. : pas de compte possible sans accepter la pub ciblée)",
+      "Le consentement a été enregistré dans un logiciel de gestion interne",
+      "Le consentement a été donné en français et le site est en français"
+    ],
+    correct: 1,
+    exp: "Un consentement est invalide s'il est conditionné à l'accès à un service. Le consentement doit être LIBRE, c'est-à-dire sans conséquences négatives en cas de refus. Si l'utilisateur ne peut pas créer de compte sans accepter la pub ciblée, son consentement n'est pas libre."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 6 — DROITS DES PERSONNES (Q38–Q45)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 15",
+    q: "Que permet le droit d'accès (Art. 15) ?",
+    opts: [
+      "Accéder physiquement aux locaux où sont stockées les données",
+      "Savoir si des données personnelles sont traitées et en obtenir une copie, ainsi que des informations sur le traitement",
+      "Accéder au système informatique du RT pour vérifier les données soi-même",
+      "Exiger que le RT détruise immédiatement toutes les données le concernant"
+    ],
+    correct: 1,
+    exp: "Le droit d'accès (Art. 15) permet à toute personne de demander : (1) confirmation que des données la concernant sont traitées, (2) une copie de ces données, (3) des informations sur la finalité, les destinataires, la durée de conservation..."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 17",
+    q: "Quel article du RGPD prévoit le droit à l'effacement (droit à l'oubli) ?",
+    opts: [
+      "Article 15",
+      "Article 16",
+      "Article 17",
+      "Article 20"
+    ],
+    correct: 2,
+    exp: "Le droit à l'oubli (ou droit à l'effacement) est prévu par l'article 17. Il permet de demander la suppression des données notamment quand elles ne sont plus nécessaires, que le consentement est retiré, ou qu'elles ont été illégalement traitées."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 17 / 18",
+    q: "Quelle est la différence entre le droit à l'effacement (Art. 17) et le droit à la limitation du traitement (Art. 18) ?",
+    opts: [
+      "Ce sont deux droits identiques qui peuvent être exercés indifféremment",
+      "L'effacement supprime définitivement les données ; la limitation les 'gèle' (conservées mais traitement suspendu)",
+      "L'effacement concerne les données numériques ; la limitation les données papier",
+      "L'effacement s'applique aux clients ; la limitation s'applique aux employés"
+    ],
+    correct: 1,
+    exp: "L'effacement = suppression définitive des données. La limitation = les données sont conservées mais leur traitement est suspendu (gelé). La limitation est utile par exemple quand la personne conteste l'exactitude des données : on arrête de les utiliser le temps de vérifier."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 20",
+    q: "Le droit à la portabilité des données (Art. 20) permet à une personne de...",
+    opts: [
+      "Exiger que ses données soient stockées dans un pays de son choix",
+      "Récupérer ses données dans un format structuré et lisible par machine pour les transmettre à un autre service",
+      "Contrôler l'accès à ses données depuis n'importe quel appareil mobile",
+      "Demander que ses données soient portées à la connaissance d'un juge"
+    ],
+    correct: 1,
+    exp: "La portabilité (Art. 20) permet de récupérer ses données dans un format ouvert et réutilisable (CSV, JSON...) pour les importer chez un concurrent. L'objectif est d'éviter l'enfermement ('lock-in') chez un prestataire grâce à ses propres données."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 21",
+    q: "Le droit d'opposition (Art. 21) permet de...",
+    opts: [
+      "S'opposer à n'importe quel traitement, immédiatement et sans condition",
+      "S'opposer à un traitement fondé sur l'intérêt légitime, pour des raisons tenant à sa situation particulière",
+      "S'opposer uniquement aux traitements à des fins de prospection commerciale directe",
+      "S'opposer à une décision de la CNIL concernant ses données"
+    ],
+    correct: 1,
+    exp: "Le droit d'opposition (Art. 21) permet de s'opposer à un traitement, notamment fondé sur l'intérêt légitime. La personne doit invoquer des raisons tenant à sa situation particulière. Pour les traitements à des fins de prospection commerciale, l'opposition est absolue (sans justification nécessaire)."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 19",
+    q: "Qu'est-ce que le droit à la notification (Art. 19) ?",
+    opts: [
+      "Le droit d'être notifié en cas de violation des données personnelles",
+      "L'obligation du RT de notifier à chaque destinataire toute rectification, effacement ou limitation appliqué aux données",
+      "Le droit d'être informé avant toute prise de décision automatisée",
+      "L'obligation d'envoyer une notification annuelle à chaque personne concernée"
+    ],
+    correct: 1,
+    exp: "La notification (Art. 19) est une obligation du RT : si une rectification, suppression ou limitation est appliquée à des données, il doit en informer chaque destinataire à qui ces données avaient été communiquées — sauf si cela représente des efforts disproportionnés."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 16",
+    q: "Le droit de rectification (Art. 16) concerne...",
+    opts: [
+      "La rectification d'une erreur dans un contrat signé entre l'entreprise et la personne",
+      "La correction de données personnelles inexactes ou incomplètes concernant la personne",
+      "La modification des conditions générales d'utilisation d'un service",
+      "La rectification de la base légale d'un traitement par le DPO"
+    ],
+    correct: 1,
+    exp: "Le droit de rectification (Art. 16) permet à toute personne d'exiger la correction de données inexactes ou incomplètes la concernant, dans les meilleurs délais. C'est le corollaire du principe d'exactitude des données (Art. 5.1.d)."
+  },
+  {
+    cat: "👤 Droits des personnes",
+    art: "Art. 15–21",
+    q: "Dans quel délai le responsable du traitement doit-il généralement répondre à l'exercice d'un droit par une personne concernée ?",
+    opts: [
+      "Immédiatement, dans les 24 heures",
+      "Dans les meilleurs délais, au maximum 1 mois (prorogeable à 3 mois en cas de demandes complexes)",
+      "Dans un délai maximum de 6 mois",
+      "Dans les 15 jours ouvrés"
+    ],
+    correct: 1,
+    exp: "Le RT doit répondre dans un délai d'UN MOIS à compter de la réception de la demande. Ce délai peut être prorogé à 3 mois pour les demandes complexes ou nombreuses, à condition d'en informer la personne dans le premier mois."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 7 — OBLIGATIONS (Q46–Q49)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "📋 Obligations",
+    art: "Art. 30",
+    q: "Combien de registres une organisation qui est à la fois RT et sous-traitant doit-elle tenir ?",
+    opts: [
+      "Un seul registre unifié suffit",
+      "Deux registres : un en tant que RT (Art. 30.1) et un en tant que ST (Art. 30.2)",
+      "Trois registres : RT, ST et violations (Art. 33.5)",
+      "Aucun registre si elle a moins de 500 salariés"
+    ],
+    correct: 2,
+    exp: "Si une organisation est à la fois RT (pour ses propres traitements) ET sous-traitant (pour ses clients), elle doit tenir TROIS registres distincts : le registre RT (Art. 30.1), le registre ST (Art. 30.2), et le registre des violations (Art. 33.5)."
+  },
+  {
+    cat: "📋 Obligations",
+    art: "Art. 33",
+    q: "Quel est le délai maximum pour notifier une violation de données à la CNIL ?",
+    opts: [
+      "24 heures après la prise de connaissance",
+      "48 heures après la prise de connaissance",
+      "72 heures après la prise de connaissance",
+      "1 semaine après la prise de connaissance"
+    ],
+    correct: 2,
+    exp: "Le délai légal est de 72 HEURES (Art. 33). Ce délai court à compter du moment où l'organisation a pris connaissance de la violation. Si la notification est faite après ce délai, les raisons du retard doivent être expliquées à la CNIL."
+  },
+  {
+    cat: "📋 Obligations",
+    art: "Art. 30",
+    q: "Une entreprise de 180 salariés traitant des données de santé à grande échelle est-elle exemptée de tenir un registre des traitements ?",
+    opts: [
+      "Oui, car elle a moins de 250 salariés — l'exemption s'applique automatiquement",
+      "Oui, si elle a désigné un DPO qui gère les registres",
+      "Non, l'exemption des moins de 250 salariés ne s'applique pas si le traitement porte sur des données sensibles",
+      "Non, l'exemption ne s'applique qu'aux entreprises de moins de 10 salariés"
+    ],
+    correct: 2,
+    exp: "L'exemption de registre pour les moins de 250 salariés EST PARTIELLE. Elle ne s'applique pas si le traitement est susceptible de comporter un risque pour les droits des personnes, s'il n'est pas occasionnel, ou s'il porte sur des données sensibles (santé, infractions...). En pratique, la plupart des PME ont quand même des obligations."
+  },
+  {
+    cat: "📋 Obligations",
+    art: "Art. 34",
+    q: "Si notifier individuellement les personnes concernées par une violation est impossible (efforts disproportionnés), que doit faire le RT ?",
+    opts: [
+      "Ne pas les notifier et documenter uniquement la violation dans le registre interne",
+      "Attendre que les personnes le contactent d'elles-mêmes",
+      "Réaliser une communication publique équivalente (ex. : annonce sur son site web)",
+      "Déléguer la notification à la CNIL qui informera les personnes à sa place"
+    ],
+    correct: 2,
+    exp: "Quand la notification individuelle est impossible ou exigerait des efforts disproportionnés (ex. : des millions de personnes affectées), une mesure équivalente peut être prise : communication dans les médias, annonce publique sur le site web, etc. (Art. 34.3.c)."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 8 — CNIL & SANCTIONS (Q50–Q55... jusqu'à Q50)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "🏛️ CNIL & Sanctions",
+    art: "",
+    q: "Parmi ces missions, laquelle N'appartient PAS à la CNIL ?",
+    opts: [
+      "Informer et protéger les droits des citoyens",
+      "Accompagner et conseiller les entreprises dans leur mise en conformité",
+      "Rédiger et voter les lois sur la protection des données en France",
+      "Contrôler et sanctionner les organisations non conformes"
+    ],
+    correct: 2,
+    exp: "La CNIL est une Autorité Administrative Indépendante — elle n'a pas de pouvoir législatif (elle ne vote pas les lois). Ses 3 missions sont : Informer & Protéger, Accompagner & Conseiller, Contrôler & Sanctionner."
+  },
+  {
+    cat: "🏛️ CNIL & Sanctions",
+    art: "",
+    q: "Quelle est l'amende maximale pour les violations les plus graves du RGPD (niveau 2) ?",
+    opts: [
+      "1 million d'euros ou 0,5% du chiffre d'affaires mondial",
+      "10 millions d'euros ou 2% du chiffre d'affaires mondial",
+      "20 millions d'euros ou 4% du chiffre d'affaires mondial",
+      "50 millions d'euros ou 10% du chiffre d'affaires mondial"
+    ],
+    correct: 2,
+    exp: "Les violations graves (niveau 2) peuvent être sanctionnées de 20 millions d'euros OU 4% du CA mondial de l'exercice précédent — le montant le plus élevé étant retenu. C'est ce régime qui s'applique aux violations des grands principes ou des droits des personnes."
+  },
+  {
+    cat: "🏛️ CNIL & Sanctions",
+    art: "",
+    q: "Pourquoi Amazon France Logistique a-t-il été condamné à 32 millions d'euros en 2024 ?",
+    opts: [
+      "Pour avoir vendu des données clients à des partenaires sans consentement",
+      "Pour avoir mis en place un système de surveillance des salariés excessivement intrusif et une vidéosurveillance insuffisamment sécurisée",
+      "Pour ne pas avoir désigné un DPO obligatoire",
+      "Pour avoir transféré des données de clients européens vers des serveurs américains"
+    ],
+    correct: 1,
+    exp: "En janvier 2024, la CNIL a sanctionné Amazon France Logistique de 32 millions d'euros pour avoir mis en place un système de surveillance de l'activité et des performances des salariés jugé excessivement intrusif, et pour de la vidéosurveillance sans information et insuffisamment sécurisée."
+  },
+  {
+    cat: "🏛️ CNIL & Sanctions",
+    art: "",
+    q: "La CNIL peut effectuer ses contrôles de 4 façons différentes. Laquelle de ces méthodes N'existe PAS ?",
+    opts: [
+      "Contrôle sur place (visite des locaux)",
+      "Contrôle sur pièce (examen de documents transmis)",
+      "Contrôle par intelligence artificielle (analyse automatique des sites)",
+      "Contrôle en ligne (vérification du site web)"
+    ],
+    correct: 2,
+    exp: "Les 4 méthodes d'enquête de la CNIL sont : sur place, sur pièce, sur audition (convocation) et en ligne. Le 'contrôle par IA automatique' n'est pas une catégorie officielle, même si la CNIL utilise des outils techniques pour ses investigations en ligne."
+  },
+  {
+    cat: "🏛️ CNIL & Sanctions",
+    art: "",
+    q: "En plus de l'amende financière, quelles autres conséquences peut entraîner une sanction de la CNIL ?",
+    opts: [
+      "La fermeture automatique et définitive de l'entreprise",
+      "La publication de la décision (exposition médiatique) et l'obligation d'en informer ses clients",
+      "L'emprisonnement automatique du dirigeant",
+      "Le placement sous tutelle judiciaire pendant 5 ans"
+    ],
+    correct: 1,
+    exp: "La CNIL peut publier ses décisions de sanction (ce qui crée une exposition médiatique négative). De plus, l'entreprise peut être obligée d'informer ses propres clients de la sanction prononcée. L'impact réputationnel peut être aussi grave que l'amende elle-même (cas de Carrefour)."
+  },
+
+  // ══════════════════════════════════════════════
+  // BLOC 9 — MISE EN CONFORMITÉ (Q50)
+  // ══════════════════════════════════════════════
+
+  {
+    cat: "🗂️ Mise en conformité",
+    art: "Art. 37",
+    q: "Dans quels cas la désignation d'un DPO est-elle OBLIGATOIRE ?",
+    opts: [
+      "Pour toutes les entreprises sans exception",
+      "Uniquement pour les entreprises de plus de 250 salariés",
+      "Pour les autorités/organismes publics, les traitements à grande échelle avec suivi régulier, et les données sensibles à grande échelle",
+      "Uniquement pour les entreprises traitant des données de santé"
+    ],
+    correct: 2,
+    exp: "Le DPO est obligatoire dans 3 cas précis (Art. 37.1) : (1) traitement par une autorité ou un organisme public, (2) traitement à grande échelle impliquant un suivi régulier des personnes, (3) traitement à grande échelle de données sensibles ou pénales. Dans tous les autres cas, la désignation est facultative mais fortement recommandée."
+  },
+
+  // Question bonus Q50
+  {
+    cat: "🗂️ Mise en conformité",
+    art: "",
+    q: "Laquelle de ces affirmations sur la conformité RGPD est correcte ?",
+    opts: [
+      "La conformité RGPD est un projet ponctuel qu'on réalise une seule fois, puis qu'on n'a plus besoin de revoir",
+      "La conformité concerne uniquement le service informatique de l'entreprise",
+      "La conformité RGPD est une démarche continue nécessitant une mise à jour régulière des documents et processus",
+      "Une fois certifié AFNOR, une entreprise est définitivement dispensée de toute obligation RGPD"
+    ],
+    correct: 2,
+    exp: "La conformité RGPD n'est PAS un projet qu'on fait une fois. Chaque nouveau traitement, nouveau sous-traitant, nouvelle fonctionnalité doit être évalué et documenté. La documentation doit être vivante et actualisée en permanence. C'est l'essence même du principe d'accountability."
+  }
+
+];
+
+// ═══════════════════════════════════════════════
+// QUIZ ENGINE
+// ═══════════════════════════════════════════════
+
+let currentQ = 0;
+let score = 0;
+let answered = 0;
+let correctCount = 0;
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// Shuffle question order
+const shuffledQuestions = shuffle(QUESTIONS);
+
+function render(){
+  const q = shuffledQuestions[currentQ];
+
+  // Progress
+  const pct = (currentQ / shuffledQuestions.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = currentQ + ' / ' + shuffledQuestions.length;
+
+  // Score
+  document.getElementById('score-display').textContent = correctCount + ' / ' + answered;
+
+  // Card top
+  document.getElementById('cat-badge').textContent = q.cat;
+  document.getElementById('q-num').textContent = 'Q' + (currentQ + 1) + ' / ' + shuffledQuestions.length;
+
+  // Question
+  document.getElementById('question-text').textContent = q.q;
+
+  // Art ref
+  const artEl = document.getElementById('art-ref');
+  artEl.textContent = q.art ? q.art : '';
+
+  // Options
+  const optsEl = document.getElementById('options');
+  optsEl.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<div class="opt-letter">${letters[i]}</div><div class="opt-text">${opt}</div>`;
+    div.addEventListener('click', () => selectAnswer(i, div, q));
+    optsEl.appendChild(div);
+  });
+
+  // Explanation
+  const expEl = document.getElementById('explanation');
+  expEl.className = 'explanation';
+  expEl.innerHTML = '';
+
+  // Result mini
+  const rmEl = document.getElementById('result-mini');
+  rmEl.className = 'result-mini';
+  rmEl.innerHTML = '';
+
+  // Btn
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-next').textContent = currentQ < shuffledQuestions.length - 1 ? 'Question suivante →' : 'Voir les résultats 🏆';
+}
+
+function selectAnswer(idx, clickedDiv, q){
+  // Prevent multiple clicks
+  document.querySelectorAll('.option').forEach(o => {
+    o.classList.add('disabled');
+    o.style.pointerEvents = 'none';
+  });
+
+  answered++;
+  const isCorrect = idx === q.correct;
+
+  if(isCorrect){
+    correctCount++;
+    clickedDiv.classList.add('correct');
+  } else {
+    clickedDiv.classList.add('wrong');
+    // Show correct answer
+    document.querySelectorAll('.option')[q.correct].classList.add('correct');
+    // Dim others
+    document.querySelectorAll('.option').forEach((o, i) => {
+      if(i !== idx && i !== q.correct) o.classList.add('neutral-dim');
+    });
+  }
+
+  // Explanation
+  const expEl = document.getElementById('explanation');
+  expEl.className = 'explanation show ' + (isCorrect ? 'correct-exp' : 'wrong-exp');
+  const icon = isCorrect ? '✅' : '❌';
+  expEl.innerHTML = `<span class="exp-icon">${icon}</span>${q.exp}`;
+
+  // Result mini
+  const rmEl = document.getElementById('result-mini');
+  rmEl.className = 'result-mini show';
+  if(isCorrect){
+    rmEl.innerHTML = '<span class="correct-label">Bonne réponse !</span>';
+  } else {
+    rmEl.innerHTML = '<span class="wrong-label">Réponse incorrecte.</span>';
+  }
+
+  // Score display
+  document.getElementById('score-display').textContent = correctCount + ' / ' + answered;
+
+  // Enable next
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ >= shuffledQuestions.length){
+    showFinal();
+    return;
+  }
+  // Re-render with animation
+  const card = document.getElementById('quiz-card');
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(8px)';
+  setTimeout(() => {
+    render();
+    card.style.transition = 'opacity .3s ease, transform .3s ease';
+    card.style.opacity = '1';
+    card.style.transform = 'translateY(0)';
+  }, 150);
+}
+
+function showFinal(){
+  document.getElementById('quiz-card').style.display = 'none';
+  const final = document.getElementById('final-screen');
+  final.style.display = 'block';
+
+  const pct = Math.round((correctCount / shuffledQuestions.length) * 100);
+
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-text').textContent = shuffledQuestions.length + ' / ' + shuffledQuestions.length;
+  document.getElementById('score-display').textContent = correctCount + ' / ' + shuffledQuestions.length;
+
+  document.getElementById('final-score-big').textContent = correctCount + ' / ' + shuffledQuestions.length;
+  document.getElementById('final-score-label').textContent = 'bonnes réponses · ' + pct + '% de réussite';
+
+  document.getElementById('bd-correct').textContent = correctCount;
+  document.getElementById('bd-wrong').textContent = shuffledQuestions.length - correctCount;
+  document.getElementById('bd-pct').textContent = pct + '%';
+
+  let trophy, cls, msg;
+  if(pct >= 90){
+    trophy = '🏆';
+    cls = 'perf-excellent';
+    msg = 'Excellent ! Tu maîtrises parfaitement le cours RGPD. Tu es prêt(e) pour l\'examen !';
+  } else if(pct >= 75){
+    trophy = '🎯';
+    cls = 'perf-bien';
+    msg = 'Très bien ! Quelques points à revoir, mais tu as une bonne maîtrise globale du cours.';
+  } else if(pct >= 60){
+    trophy = '📚';
+    cls = 'perf-moyen';
+    msg = 'Assez bien. Revois les sections où tu as fait des erreurs — surtout les bases légales et les pièges de définition.';
+  } else {
+    trophy = '💪';
+    cls = 'perf-faible';
+    msg = 'Il reste du travail ! Reprends le cours complet, notamment les définitions, les principes et les droits des personnes.';
+  }
+
+  document.getElementById('final-trophy').textContent = trophy;
+  const perfEl = document.getElementById('perf-msg');
+  perfEl.className = 'perf-msg ' + cls;
+  perfEl.textContent = msg;
+}
+
+function restartQuiz(){
+  currentQ = 0;
+  score = 0;
+  answered = 0;
+  correctCount = 0;
+
+  // Re-shuffle
+  const newOrder = shuffle(QUESTIONS);
+  shuffledQuestions.length = 0;
+  newOrder.forEach(q => shuffledQuestions.push(q));
+
+  document.getElementById('final-screen').style.display = 'none';
+  const card = document.getElementById('quiz-card');
+  card.style.display = 'block';
+  card.style.opacity = '1';
+  card.style.transform = 'none';
+  card.style.transition = 'none';
+
+  render();
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('quiz-card').style.display = 'block';
+  render();
+});
+</script>
+</body>
+</html>
